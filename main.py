@@ -1,6 +1,105 @@
 import os
 import json
-from PIL import Image
+from PIL import Image, ImageOps
+from random import choice
+
+def imgtoddf(file_name: str) -> bool:
+    try:
+        os.system(f"quicktex encode auto {file_name}")
+        return True
+    except Exception as error:
+        print(error+"\n")
+        print("Image to DDF conversion error, you'll need to do this manually with the images generated.")
+        return False
+
+def config_template():
+    return {
+        "image_directory": "images/",
+        "required_images": 54,
+        "image_size": {
+            "height": 1024,
+            "width": 1024
+        },
+        "BoxArt2Positions": [
+            {   
+                "name": "image1",
+                "image_x": 682,
+                "image_y": 101,
+                "image_width": 180,
+                "image_height": 225
+            },
+            {   
+                "name": "image2",
+                "image_x": 861,
+                "image_y": 121,
+                "image_width": 163,
+                "image_height": 205
+            },
+            {   
+                "name": "image3",
+                "image_x": 523,
+                "image_y": 325,
+                "image_width": 169,
+                "image_height": 228
+            },
+            {   
+                "name": "image4",
+                "image_x": 699,
+                "image_y": 325,
+                "image_width": 159,
+                "image_height": 234
+            },
+            {   
+                "name": "image5",
+                "image_x": 857,
+                "image_y": 325,
+                "image_width": 167,
+                "image_height": 237
+            },
+            {   
+                "name": "image6",
+                "image_x": 506,
+                "image_y": 572,
+                "image_width": 174,
+                "image_height": 208
+            },
+            {   
+                "name": "image7",
+                "image_x": 689,
+                "image_y": 561,
+                "image_width": 165,
+                "image_height": 264
+            },
+            {   
+                "name": "image8",
+                "image_x": 865,
+                "image_y": 572,
+                "image_width": 158,
+                "image_height": 221
+            },
+            {   
+                "name": "image9",
+                "image_x": 494,
+                "image_y": 794,
+                "image_width": 188,
+                "image_height": 230
+            },
+            {   
+                "name": "image10",
+                "image_x": 682,
+                "image_y": 794,
+                "image_width": 175,
+                "image_height": 230
+            },
+            {   
+                "name": "image11",
+                "image_x": 867,
+                "image_y": 806,
+                "image_width": 152,
+                "image_height": 208
+            }
+        ]
+    }
 
 ###
 # Obtaining JSON config and assigning variables
@@ -16,14 +115,7 @@ def get_config():
         except FileNotFoundError:
             print("Config JSON not found, generating one from template...")
             
-            template = {
-                "image_directory": "images/",
-                "required_images": 54,
-                "image_size": {
-                    "height": 1024, 
-                    "width": 1024
-                    }
-            }
+            template = config_template()
             
             with open("config.json", "w") as file:
                 json.dump(template, file, indent = 4)
@@ -32,6 +124,7 @@ config = get_config()
 image_size = config["image_size"]["height"], config["image_size"]["width"]
 image_directory = config["image_directory"]
 image_amount_requirement = config["required_images"]
+BoxArt2Positions = config["BoxArt2Positions"]
 video_outer_cover_size = 135, 206
 video_inner_cover_size = 104, 206
 
@@ -47,7 +140,6 @@ def get_image_list() -> dict[str]:
 
     image_list = os.listdir(image_directory)
     return image_list
-
 
 image_list = get_image_list()
 
@@ -66,8 +158,7 @@ for file in image_list:
 
 # Generating Box Art 1 image
 def BoxArt1():
-    image = Image.new(mode = "RGB", size = image_size)
-    image.paste((53, 51, 51), (0, 0, image.size[0], image.size[1]))
+    image = Image.open("template/BoxArt1.png")
     
     times_iterated = 0
     x = 0
@@ -76,9 +167,9 @@ def BoxArt1():
         pasting_image = Image.open(f"{image_directory}{file}")
 
         # Pasting outer cover
-        image.paste(pasting_image.resize(video_outer_cover_size).rotate(180).transpose(method=Image.FLIP_LEFT_RIGHT), box = (x, y))
+        image.paste(pasting_image.resize(video_outer_cover_size), box = (x, y))
         # Pasting inner cover
-        image.paste(pasting_image.resize(video_inner_cover_size).rotate(180).transpose(method=Image.FLIP_LEFT_RIGHT), box = (x, y))
+        image.paste(pasting_image.resize(video_inner_cover_size), box = (x, y))
 
         times_iterated += 1
         x += 136
@@ -88,7 +179,34 @@ def BoxArt1():
 
         if times_iterated >= 30:
             break
-    
-    image.show()
 
-BoxArt1()
+    file_name = "BoxArt1.png"
+    image.save(file_name)
+    
+    os.system(f"quicktex encode auto {file_name}")
+
+def BoxArt2():
+    image = Image.open("template/BoxArt2.png")
+
+    pasted_images = []
+
+    for data in BoxArt2Positions:
+        while True:
+            img = choice(image_list)
+            if img not in pasted_images:
+                pasted_images.append(img)
+                break
+        
+        pasting_image = Image.open(f"{image_directory}{img}")
+        flipped = ImageOps.flip(pasting_image.resize((data["image_width"], data["image_height"])))
+        # Pasting image
+        image.paste(flipped, box = (data["image_x"], data["image_y"]))
+
+    file_name = "BoxArt2.png"
+    mirrored = ImageOps.flip(image)
+    mirrored.save(file_name)
+    
+    os.system(f"quicktex encode auto {file_name}")
+
+def BoxArtBig():
+    pass
