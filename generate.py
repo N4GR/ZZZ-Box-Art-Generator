@@ -3,14 +3,6 @@ import os, json
 class generate:
     def config(directory = None, file_name = str) -> None:
         template = {
-                    "image_directory": "images",
-                    "mods_directory": "mods",
-                    "required_images": 54,
-                    "image_size": {
-                        "height": 1024,
-                        "width": 1024
-                },
-
                 "BoxArt1": {
                     "canvas_size": {
                         "height": 1024,
@@ -30,6 +22,11 @@ class generate:
                 },
 
                 "BoxArt2": {
+                    "canvas_size": {
+                        "height": 1024,
+                        "width": 1024
+                    },
+
                     "positions": [
                         {
                             "name": "image1",
@@ -112,6 +109,11 @@ class generate:
                 },
 
                 "BoxArtBigger": {
+                    "canvas_size": {
+                        "height": 1024,
+                        "width": 1024
+                    },
+
                     "positions": [
                         {
                             "name": "image1",
