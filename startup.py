@@ -1,13 +1,49 @@
 from generate import generate
-from os import path
+from log import logging
+import os
 
-def startChecks() -> bool:
+def checks():
+    if folders() is False: return False
+    elif imageListCount() is False: return False
+    else: return True
+
+def folders():
     # Generate necessary folders if they don't exist.
     dir_names = ["mods", "images"]
     for dir_name in dir_names:
-        if not path.isdir(dir_name): generate.directory(name = dir_name)
+        if not os.path.isdir(dir_name):
+            try:
+                generate.directory(name = dir_name)
+            except Exception as error:
+                print(logging().error(f"Couldn't generate directory: {dir_name}"))
+                print(logging().error(error))
+                return False
+    
 
     config_name = "config"
-    if not path.isfile(f"{config_name}.json"): generate.config(file_name = "config")
-
+    if not os.path.isfile(f"{config_name}.json"):
+        try:
+            generate.config(file_name = "config")
+        except Exception as error:
+            print(logging().error(f"Couldn't generate config.json"))
+            print(logging().error(error))
+            return False
+    
     return True
+
+def imageListCount():
+    image_count = len(generate.image_list())
+    if image_count < 53:
+        print(logging().error(f"53 Images required, you only have {image_count}"))
+        return False
+    return True
+
+def inputs() -> dict[str | int]:
+    mod_name = input("What would you like the mod to be called? ")
+    mod_name = mod_name.replace(" ", "_").lower()
+
+    inp = {
+        "mod_name": mod_name
+    }
+
+    return inp

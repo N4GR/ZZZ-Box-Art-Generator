@@ -1,44 +1,47 @@
-from startup import startChecks
+from startup import checks, inputs
 from log import logging
 from config import config
+from generate import generate
 
-from os import listdir
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from colorthief import ColorThief
 from wand import image
-
 from random import choice
+import os
 
-def image_list() -> list[str]:
-    image_directory = "images"
-    images = listdir(image_directory)
+if checks() is False:
+    os.abort()
 
-    file_count = len(images)
-    error_count = 0
-    print(logging().note(f"Detected {file_count} files, verifying integrity..."))
-    for file in images:
-        try:
-            with Image.open(f"{image_directory}/{file}") as img:
-                img.verify()
-        except (IOError, SyntaxError):
-            print(logging().error(f"{image_directory}/{file}"))
-            images.remove(file)
-            error_count += 1
+def inputChecks() -> dict[str | int]:
+    while True:
+        inp = inputs()
 
-    print(logging().note(f"{file_count - error_count}/{file_count} usable files."))
-    
-    return images
+        mod_name = inp["mod_name"]
+        mod_path = f"mods/{inp["mod_name"]}"
 
-def BoxArt1():
+        if os.path.isdir(mod_path) is False:
+            generate.directory("mods", mod_name)
+            return inp
+        else:
+            print(logging().error("Mod already exists in 'mods/' directory"))
+
+def BoxArt():
+    inp = inputChecks()
+    mod_name = inp["mod_name"]
+    mod_path = f"mods/{mod_name}"
+
     conf = config()
 
-    #files = [conf.BoxArt1(), conf.BoxArt2(), conf.BoxArtBigger()]
-    files = [conf.BoxArt1()]
+    # The art to generate
+    files = [conf.BoxArt1, conf.BoxArt2, conf.BoxArtBigger]
+    #files = [conf.BoxArt1()]
 
-    images = image_list()
+    images = generate.image_list()
 
-    file_count = 0 # 0 = BoxArt1, 1 = BoxArt2, 3 = BoxArtBigger
     for file in files:
+        file_name = file.__name__
+        file = file()
+    
         canvas = Image.new(mode = "RGB", size = (file["canvas_size"]["width"], file["canvas_size"]["height"]))
 
 
@@ -47,10 +50,11 @@ def BoxArt1():
             image_directory = f"images/{images[0]}"
             cover = Image.open(image_directory)
             cover = cover.resize((cover_data["image_width"], cover_data["image_height"]), Image.Resampling.LANCZOS)
+            cover = cover.rotate(cover_data["rotation"], expand = True)
 
             canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
 
-            if file_count == 0:
+            if file_name == "BoxArt1":
                 # Pasting bottom bar
                 dominant_colour = ColorThief(image_directory).get_color(quality = 8)
                 canvas.paste(dominant_colour, (cover_data["image_x"], cover_data["image_y"] + cover_data["image_height"], cover_data["image_x"] + cover_data["image_width"] + 26, cover_data["image_y"] + cover_data["image_height"] + 26))
@@ -92,13 +96,12 @@ def BoxArt1():
             
             del images[0]
 
-        file_count += 1
+        canvas = ImageOps.flip(canvas)
+        canvas.save(f"{mod_path}/{file_name}.png")
+        with image.Image(filename = f"{mod_path}/{file_name}.png") as img:
+            img.compression = "dxt5"
+            img.save(filename = f"{mod_path}/{file_name}.dds")
     
-    canvas.show()
-    canvas = ImageOps.flip(canvas)
-    canvas.save("hello.png")
-    with image.Image(filename = "hello.png") as img:
-        img.compression = "dxt5"
-        img.save(filename = "hello.dds")
+    generate.ini(mod_path, mod_name)
 
-BoxArt1()
+BoxArt()
