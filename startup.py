@@ -6,6 +6,7 @@ import time
 from json import load
 
 def checks():
+    version_check()
     if folders() is False: return False
     elif imageListCount() is False: return False
     else: return True
