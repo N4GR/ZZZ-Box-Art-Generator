@@ -26,7 +26,7 @@ This section will tell you how to download and Install the latest version of ZZZ
 4. Head over to to [ImageMagick](https://imagemagick.org/script/download.php#windows)'s website, this contains libraries for converting PNG to DLL. Once there, click on the latest version to download and install it.
 ![ImageMagick Install](https://i.imgur.com/UeZvZOD.png)
 
-4. Once python is installed, open terminal by pressing the windows key and searching for it.
+5. Once python is installed, open terminal by pressing the windows key and searching for it.
 ![Terminal Navigation](https://i.imgur.com/pRSIbIg.png)
     - Verify Python is working using the following command in terminal:
 ```
@@ -35,15 +35,15 @@ python --version
 which should output:
 ![Python Image](https://i.imgur.com/YeqxO7t.png)
 
-5. Close the terminal and head into the ZZZ-Box-Art folder you extracted earlier.
+6. Close the terminal and head into the ZZZ-Box-Art folder you extracted earlier.
     - Rick click an empty space inside the folder and you should see "Open in Terminal"
     - Select that option and it should launch the terminal inside the directory.
-6. Run the following command in the terminal to install the dependencies for the tool:
+7. Run the following command in the terminal to install the dependencies for the tool:
     - Wait for the download to complete before following onto the next step.
 ```
 pip install -r "requirements.txt"
 ```
-7. Congratulations, you now have a fully functioning version of the tool!
+8. Congratulations, you now have a fully functioning version of the tool!
 
 
 ## Usage/Examples
