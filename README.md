@@ -2,6 +2,9 @@
 
 ZZZ Box Art Generator is a quick multi-threaded tool that will allow people to seamlessly modify the VHS tapes, posters and more in your store, Random Play. This tool is simple to use, you drop the images into the images directory, launch up the script providing it with a name for your mod and the tool will do the rest.
 
+![Cover Image](https://i.imgur.com/jrytysQ.png)
+![Cover Image 2](https://i.imgur.com/HaeYoQh.jpeg)
+![Cover Image 3](https://i.imgur.com/C4q37LW.jpeg)
 
 ## Download & Install
 
