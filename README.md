@@ -68,6 +68,7 @@ python .\main.py --name "mod-name"
 - Previews directory containing PNG previews.
 - DDS files.
 - Populated .ini file with hashes.
+
 ![generated folder](https://i.imgur.com/wMNT7R3.png)
 
 7. Move the generated folder into your mods directory of your model importer for ZZZ.
