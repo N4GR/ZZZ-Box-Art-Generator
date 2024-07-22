@@ -502,7 +502,7 @@ checktextureoverride = ps-t1
             with open(full_path, "w") as file:
                 file.write(template)
         else:
-            print("Already exists.")
+            print(logging().error(f"Tried to make a file that already exists... [{full_path}]"))
 
     def directory(path = None, name = str) -> None:
         full_path = name if not path else f"{path}/{name}"
@@ -510,7 +510,7 @@ checktextureoverride = ps-t1
         if not os.path.isdir(full_path):
             os.mkdir(full_path)
         else:
-            print("Already exists.")
+            print(logging().error(f"Tried to make a directory that already exists... [{full_path}]"))
     
     def image_list() -> list[str]:
         image_directory = "images"
@@ -523,6 +523,8 @@ checktextureoverride = ps-t1
             try:
                 with Image.open(f"{image_directory}/{file}") as img:
                     img.verify()
+                
+                print(logging().success(f"[{file}] is a valid image..."))
             except (IOError, SyntaxError):
                 print(logging().error(f"{image_directory}/{file}"))
                 images.remove(file)

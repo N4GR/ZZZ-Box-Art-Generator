@@ -19,7 +19,7 @@ def argCheck(arg: str) -> dict[str | int]:
         generate.directory(f"mods/{mod_name}", "previews")
         return mod_name
     else:
-        print(logging().error("Mod already exists in 'mods/' directory"))
+        print(logging().error(f"[mods/{mod_name}] already exists, use a different mod name or delete the old mod directory."))
         os.abort()
 
 def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
@@ -40,25 +40,24 @@ def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
     botbar()
 
 def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: str):
-    print(logging().note(f"Processing images/{cover_image}"))
+    print(logging().note(f"Processing [images/{cover_image}]."))
     image_directory = f"images/{cover_image}"
     cover = Image.open(image_directory)
     cover = cover.resize((cover_data["image_width"], cover_data["image_height"]), Image.Resampling.LANCZOS)
     cover = cover.rotate(cover_data["rotation"], expand = True)
 
     canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
+    print(logging().success(f"Processed [images/{cover_image}]."))
 
     if file_name == "BoxArt1": BoxArt1(canvas, cover_data, cover)
 
-def BoxArt(mod_name: str):
+def BoxArt(mod_name: str, images: list):
     mod_path = f"mods/{mod_name}"
 
     conf = config()
 
     # The art to generate
     files = [conf.BoxArt1, conf.BoxArt2, conf.BoxArtBig]
-
-    images = generate.image_list()
 
     for file in files:
         file_name = file.__name__
@@ -83,12 +82,16 @@ def BoxArt(mod_name: str):
         canvas = ImageOps.flip(canvas)
         canvas.save(f"{mod_path}/previews/{file_name}.png")
         with image.Image(filename = f"{mod_path}/previews/{file_name}.png") as img:
+            print(logging().note(f"Converting [{mod_path}/previews/{file_name}.png] to ddf..."))
             img.compression = "dxt5"
             img.save(filename = f"{mod_path}/{file_name}.dds")
+            print(logging().success(f"Successfully converted [{mod_path}/previews/{file_name}.png] to [{mod_path}/{file_name}.dds]."))
         
         os.remove(f"{mod_path}/previews/{file_name}.png")
         canvas = ImageOps.flip(canvas)
+        print(logging().note(f"Saving [{mod_path}/previews/{file_name}.png] as preview..."))
         canvas.save(f"{mod_path}/previews/{file_name}.png")
+        print(logging().success(f"Successfully saved [{mod_path}/previews/{file_name}.png] as preview."))
     
     generate.ini(mod_path, mod_name)
 
@@ -97,8 +100,10 @@ if __name__ == "__main__":
     parser.add_argument("--name", type=str, required=True, help="Name of the mod")
 
     args = parser.parse_args()
+    
+    check = checks()
 
-    if checks() is False:
+    if check is False:
         os.abort()
-
-    BoxArt(argCheck(args.name))
+    else:
+        BoxArt(argCheck(args.name), check)

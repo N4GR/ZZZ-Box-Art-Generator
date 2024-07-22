@@ -8,8 +8,10 @@ from json import load
 def checks():
     version_check()
     if folders() is False: return False
-    elif imageListCount() is False: return False
-    else: return True
+
+    image_list = imageListCount()
+    if image_list is False: return False
+    else: return image_list[1]
 
 def folders():
     # Generate necessary folders if they don't exist.
@@ -36,11 +38,12 @@ def folders():
     return True
 
 def imageListCount():
-    image_count = len(generate.image_list())
+    image_list = generate.image_list()
+    image_count = len(image_list)
     if image_count < 53:
         print(logging().error(f"53 Images required, you only have {image_count}"))
         return False
-    return True
+    return True, image_list
 
 def version_check():
     response = requests.get("https://api.github.com/repos/N4GR/ZZZ-Box-Art-Generator/releases/latest")
