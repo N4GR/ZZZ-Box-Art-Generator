@@ -101,7 +101,4 @@ if __name__ == "__main__":
     if checks() is False:
         os.abort()
 
-    print(args.name)
-    print(type(args.name))
-
     BoxArt(argCheck(args.name))
