@@ -2,6 +2,7 @@ from startup import checks
 from log import logging
 from config import config
 from generate import generate
+from versioning import version_check
 
 from PIL import Image, ImageOps
 from wand import image
@@ -48,7 +49,7 @@ def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: s
 
     canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
 
-    if file_name == "BoxArt1": BoxArt1(canvas, cover_data, image_directory, cover)
+    if file_name == "BoxArt1": BoxArt1(canvas, cover_data, cover)
 
 def BoxArt(mod_name: str):
     mod_path = f"mods/{mod_name}"
@@ -97,6 +98,8 @@ if __name__ == "__main__":
     parser.add_argument("--name", type=str, required=True, help="Name of the mod")
 
     args = parser.parse_args()
+
+
 
     if checks() is False:
         os.abort()
