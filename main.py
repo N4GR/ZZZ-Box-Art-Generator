@@ -2,7 +2,6 @@ from startup import checks
 from log import logging
 from config import config
 from generate import generate
-from versioning import version_check
 
 from PIL import Image, ImageOps
 from wand import image
