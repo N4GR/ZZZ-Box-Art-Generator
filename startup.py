@@ -1,6 +1,9 @@
 from generate import generate
 from log import logging
 import os
+import requests
+import time
+from json import load
 
 def checks():
     if folders() is False: return False
@@ -36,4 +39,21 @@ def imageListCount():
     if image_count < 53:
         print(logging().error(f"53 Images required, you only have {image_count}"))
         return False
+    return True
+
+def version_check():
+    response = requests.get("https://api.github.com/repos/N4GR/ZZZ-Box-Art-Generator/releases/latest")
+
+    with open("version.json") as file:
+        version_data = load(file)
+
+    current_version = version_data["version"]
+    newest_version = response.json()["tag_name"]
+
+    if current_version != newest_version:
+        print(logging().error(f"Tool out of date... Your version: {current_version}, latest version: {newest_version}"))
+        print(logging().note("Continuing..."))
+        time.sleep(2)
+        return False
+
     return True
