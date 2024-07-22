@@ -37,13 +37,3 @@ def imageListCount():
         print(logging().error(f"53 Images required, you only have {image_count}"))
         return False
     return True
-
-def inputs() -> dict[str | int]:
-    mod_name = input("What would you like the mod to be called? ")
-    mod_name = mod_name.replace(" ", "_").lower()
-
-    inp = {
-        "mod_name": mod_name
-    }
-
-    return inp

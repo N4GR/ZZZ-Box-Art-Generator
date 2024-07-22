@@ -1,40 +1,62 @@
-from startup import checks, inputs
+from startup import checks
 from log import logging
 from config import config
 from generate import generate
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
-from colorthief import ColorThief
+from PIL import Image, ImageOps
 from wand import image
-from random import choice
 import os
+from collections import Counter
+import threading
+import argparse
 
-if checks() is False:
-    os.abort()
+def argCheck(arg: str) -> dict[str | int]:
+    mod_name = arg.replace(" ", "_").lower()
+    mod_path = f"mods/{mod_name}"
 
-def inputChecks() -> dict[str | int]:
-    while True:
-        inp = inputs()
+    if os.path.isdir(mod_path) is False:
+        generate.directory("mods", mod_name)
+        generate.directory(f"mods/{mod_name}", "previews")
+        return mod_name
+    else:
+        print(logging().error("Mod already exists in 'mods/' directory"))
+        os.abort()
 
-        mod_name = inp["mod_name"]
-        mod_path = f"mods/{inp["mod_name"]}"
+def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
+    def botbar():
+        # Pasting bottom bar
 
-        if os.path.isdir(mod_path) is False:
-            generate.directory("mods", mod_name)
-            return inp
-        else:
-            print(logging().error("Mod already exists in 'mods/' directory"))
+        colours = cover.getdata()
+        filtered_colours = [colour for colour in colours if colour != (255, 255, 255) and colour != (0, 0, 0)]
+        colour_counts = Counter(filtered_colours)
+        common_colour = colour_counts.most_common(1)[0]
+        most_common_rgb = common_colour[0]
 
-def BoxArt():
-    inp = inputChecks()
-    mod_name = inp["mod_name"]
+        dark_grey = (53, 51, 51)
+        canvas.paste(dark_grey, (cover_data["image_x"] + cover_data["image_width"], cover_data["image_y"], cover_data["image_x"] + cover_data["image_width"] + 31, cover_data["image_y"] + cover_data["image_height"]))
+        canvas.paste(most_common_rgb, (cover_data["image_x"] + cover_data["image_width"] + 5, cover_data["image_y"], cover_data["image_x"] + cover_data["image_width"] + 26, cover_data["image_y"] + cover_data["image_height"]))
+        canvas.paste(most_common_rgb, (cover_data["image_x"], cover_data["image_y"] + cover_data["image_height"], cover_data["image_x"] + cover_data["image_width"] + 26, cover_data["image_y"] + cover_data["image_height"] + 26))
+
+    botbar()
+
+def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: str):
+    print(logging().note(f"Processing images/{cover_image}"))
+    image_directory = f"images/{cover_image}"
+    cover = Image.open(image_directory)
+    cover = cover.resize((cover_data["image_width"], cover_data["image_height"]), Image.Resampling.LANCZOS)
+    cover = cover.rotate(cover_data["rotation"], expand = True)
+
+    canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
+
+    if file_name == "BoxArt1": BoxArt1(canvas, cover_data, image_directory, cover)
+
+def BoxArt(mod_name: str):
     mod_path = f"mods/{mod_name}"
 
     conf = config()
 
     # The art to generate
-    files = [conf.BoxArt1, conf.BoxArt2, conf.BoxArtBigger]
-    #files = [conf.BoxArt1()]
+    files = [conf.BoxArt1, conf.BoxArt2, conf.BoxArtBig]
 
     images = generate.image_list()
 
@@ -43,65 +65,43 @@ def BoxArt():
         file = file()
     
         canvas = Image.new(mode = "RGB", size = (file["canvas_size"]["width"], file["canvas_size"]["height"]))
+        template = Image.open(f"template/{file_name}.png")
+        canvas.paste(template, (0, 0))
 
-
+        thread_counter = 0
+        threads = []
         for cover_data in file["positions"]:
-            print(logging().note(f"Processing images/{images[0]}"))
-            image_directory = f"images/{images[0]}"
-            cover = Image.open(image_directory)
-            cover = cover.resize((cover_data["image_width"], cover_data["image_height"]), Image.Resampling.LANCZOS)
-            cover = cover.rotate(cover_data["rotation"], expand = True)
-
-            canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
-
-            if file_name == "BoxArt1":
-                # Pasting bottom bar
-                dominant_colour = ColorThief(image_directory).get_color(quality = 8)
-                canvas.paste(dominant_colour, (cover_data["image_x"], cover_data["image_y"] + cover_data["image_height"], cover_data["image_x"] + cover_data["image_width"] + 26, cover_data["image_y"] + cover_data["image_height"] + 26))
-
-                canvas.paste(dominant_colour, (cover_data["image_x"] + cover_data["image_width"], cover_data["image_y"], cover_data["image_x"] + cover_data["image_width"] + 26, cover_data["image_y"] + cover_data["image_height"]))
-
-                # Logos
-                txt = ImageDraw.Draw(canvas)
-                txt.text((cover_data["image_x"] + cover_data["image_width"] + 2, cover_data["image_y"] + cover_data["image_height"] - 5), "VHS", font = ImageFont.truetype("template/marv.ttf", 20), fill = (255, 255, 255), anchor = "lb")
-
-                # Now I draw the circle:
-                ratings = [{
-                    "colour": (0, 255, 0),
-                    "text": "U"
-                },
-                {
-                    "colour": (255, 215, 0),
-                    "text": "PG"
-                },
-                {
-                    "colour": (255, 0, 0),
-                    "text": "18"
-                },
-                {
-                    "colour": (255, 165, 0),
-                    "text": "12"
-                },
-                {
-                    "colour": (255, 69, 0),
-                    "text": "15"
-                }]
-
-                rating = choice(ratings)
-
-                p_x, p_y = cover_data["image_x"] + cover_data["image_width"] + 13, cover_data["image_y"] + 20
-                txt.ellipse((p_x - 10, p_y - 10, p_x + 10, p_y + 10), fill = rating["colour"])
-
-                txt.text((p_x + 1, p_y), rating["text"], font = ImageFont.truetype("template/uniq.ttf", 10), fill = (255, 255, 255), anchor = "mm")
-            
-            del images[0]
+            cover_image = images[thread_counter]
+            t = threading.Thread(target = place_covers, args = (cover_data, canvas, file_name, cover_image))
+            t.start()
+            threads.append(t)
+            thread_counter += 1
+        
+        for thread in threads:
+            thread.join()
 
         canvas = ImageOps.flip(canvas)
-        canvas.save(f"{mod_path}/{file_name}.png")
-        with image.Image(filename = f"{mod_path}/{file_name}.png") as img:
+        canvas.save(f"{mod_path}/previews/{file_name}.png")
+        with image.Image(filename = f"{mod_path}/previews/{file_name}.png") as img:
             img.compression = "dxt5"
             img.save(filename = f"{mod_path}/{file_name}.dds")
+        
+        os.remove(f"{mod_path}/previews/{file_name}.png")
+        canvas = ImageOps.flip(canvas)
+        canvas.save(f"{mod_path}/previews/{file_name}.png")
     
     generate.ini(mod_path, mod_name)
 
-BoxArt()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process the --name argument.")
+    parser.add_argument("--name", type=str, required=True, help="Name of the mod")
+
+    args = parser.parse_args()
+
+    if checks() is False:
+        os.abort()
+
+    print(args.name)
+    print(type(args.name))
+
+    BoxArt(argCheck(args.name))

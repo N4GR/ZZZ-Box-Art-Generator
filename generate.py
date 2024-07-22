@@ -24,7 +24,7 @@ class generate:
                     },
                     {
                         "name": "image2",
-                        "image_x": 136,
+                        "image_x": 135,
                         "image_y": 0,
                         "image_width": 104,
                         "image_height": 178,
@@ -40,7 +40,7 @@ class generate:
                     },
                     {
                         "name": "image4",
-                        "image_x": 408,
+                        "image_x": 410,
                         "image_y": 0,
                         "image_width": 104,
                         "image_height": 178,
@@ -48,7 +48,7 @@ class generate:
                     },
                     {
                         "name": "image5",
-                        "image_x": 544,
+                        "image_x": 545,
                         "image_y": 0,
                         "image_width": 104,
                         "image_height": 178,
@@ -73,7 +73,7 @@ class generate:
                     },
                     {
                         "name": "image8",
-                        "image_x": 136,
+                        "image_x": 135,
                         "image_y": 204,
                         "image_width": 104,
                         "image_height": 178,
@@ -89,7 +89,7 @@ class generate:
                     },
                     {
                         "name": "image10",
-                        "image_x": 408,
+                        "image_x": 410,
                         "image_y": 204,
                         "image_width": 104,
                         "image_height": 178,
@@ -97,7 +97,7 @@ class generate:
                     },
                     {
                         "name": "image11",
-                        "image_x": 544,
+                        "image_x": 545,
                         "image_y": 204,
                         "image_width": 104,
                         "image_height": 178,
@@ -122,7 +122,7 @@ class generate:
                     },
                     {
                         "name": "image14",
-                        "image_x": 136,
+                        "image_x": 135,
                         "image_y": 408,
                         "image_width": 104,
                         "image_height": 178,
@@ -138,7 +138,7 @@ class generate:
                     },
                     {
                         "name": "image16",
-                        "image_x": 408,
+                        "image_x": 410,
                         "image_y": 408,
                         "image_width": 104,
                         "image_height": 178,
@@ -146,7 +146,7 @@ class generate:
                     },
                     {
                         "name": "image17",
-                        "image_x": 544,
+                        "image_x": 545,
                         "image_y": 408,
                         "image_width": 104,
                         "image_height": 178,
@@ -171,7 +171,7 @@ class generate:
                     },
                     {
                         "name": "image20",
-                        "image_x": 136,
+                        "image_x": 135,
                         "image_y": 612,
                         "image_width": 104,
                         "image_height": 178,
@@ -187,7 +187,7 @@ class generate:
                     },
                     {
                         "name": "image22",
-                        "image_x": 408,
+                        "image_x": 410,
                         "image_y": 612,
                         "image_width": 104,
                         "image_height": 178,
@@ -195,7 +195,7 @@ class generate:
                     },
                     {
                         "name": "image23",
-                        "image_x": 544,
+                        "image_x": 545,
                         "image_y": 612,
                         "image_width": 104,
                         "image_height": 178,
@@ -220,7 +220,7 @@ class generate:
                     },
                     {
                         "name": "image26",
-                        "image_x": 136,
+                        "image_x": 135,
                         "image_y": 816,
                         "image_width": 104,
                         "image_height": 178,
@@ -236,7 +236,7 @@ class generate:
                     },
                     {
                         "name": "image28",
-                        "image_x": 408,
+                        "image_x": 410,
                         "image_y": 816,
                         "image_width": 104,
                         "image_height": 178,
@@ -244,15 +244,7 @@ class generate:
                     },
                     {
                         "name": "image29",
-                        "image_x": 544,
-                        "image_y": 816,
-                        "image_width": 104,
-                        "image_height": 178,
-                        "rotation": 0
-                    },
-                    {
-                        "name": "image30",
-                        "image_x": 680,
+                        "image_x": 545,
                         "image_y": 816,
                         "image_width": 104,
                         "image_height": 178,
@@ -269,95 +261,95 @@ class generate:
                 "positions": [
                     {
                         "name": "image1",
-                        "image_x": 682,
-                        "image_y": 101,
-                        "image_width": 180,
-                        "image_height": 225,
+                        "image_x": 511,
+                        "image_y": 7,
+                        "image_width": 159,
+                        "image_height": 224,
                         "rotation": 0
                     },
                     {
                         "name": "image2",
-                        "image_x": 861,
-                        "image_y": 121,
+                        "image_x": 689,
+                        "image_y": 7,
                         "image_width": 163,
-                        "image_height": 205,
+                        "image_height": 212,
                         "rotation": 0
                     },
                     {
                         "name": "image3",
-                        "image_x": 523,
-                        "image_y": 325,
-                        "image_width": 169,
-                        "image_height": 228,
+                        "image_x": 868,
+                        "image_y": 7,
+                        "image_width": 150,
+                        "image_height": 210,
                         "rotation": 0
                     },
                     {
                         "name": "image4",
-                        "image_x": 699,
-                        "image_y": 325,
-                        "image_width": 159,
-                        "image_height": 234,
+                        "image_x": 538,
+                        "image_y": 248,
+                        "image_width": 142,
+                        "image_height": 202, 
                         "rotation": 0
                     },
                     {
                         "name": "image5",
-                        "image_x": 857,
-                        "image_y": 325,
-                        "image_width": 167,
-                        "image_height": 237,
+                        "image_x": 709,
+                        "image_y": 249,
+                        "image_width": 141,
+                        "image_height": 212,
                         "rotation": 0
                     },
                     {
                         "name": "image6",
-                        "image_x": 506,
-                        "image_y": 572,
-                        "image_width": 174,
-                        "image_height": 208,
+                        "image_x": 866,
+                        "image_y": 231,
+                        "image_width": 151,
+                        "image_height": 219,
                         "rotation": 0
                     },
                     {
                         "name": "image7",
-                        "image_x": 689,
-                        "image_y": 561,
-                        "image_width": 165,
-                        "image_height": 264,
+                        "image_x": 545,
+                        "image_y": 474,
+                        "image_width": 144,
+                        "image_height": 214,
                         "rotation": 0
                     },
                     {
                         "name": "image8",
-                        "image_x": 865,
-                        "image_y": 572,
-                        "image_width": 158,
-                        "image_height": 221,
+                        "image_x": 702,
+                        "image_y": 467,
+                        "image_width": 152,
+                        "image_height": 214,
                         "rotation": 0
                     },
                     {
                         "name": "image9",
-                        "image_x": 494,
-                        "image_y": 794,
-                        "image_width": 188,
-                        "image_height": 230,
+                        "image_x": 864,
+                        "image_y": 480,
+                        "image_width": 158,
+                        "image_height": 211,
                         "rotation": 0
                     },
                     {
                         "name": "image10",
-                        "image_x": 682,
-                        "image_y": 794,
-                        "image_width": 175,
-                        "image_height": 230,
+                        "image_x": 683,
+                        "image_y": 707,
+                        "image_width": 165,
+                        "image_height": 199,
                         "rotation": 0
                     },
                     {
                         "name": "image11",
-                        "image_x": 867,
-                        "image_y": 806,
-                        "image_width": 152,
-                        "image_height": 208,
+                        "image_x": 872,
+                        "image_y": 718,
+                        "image_width": 143,
+                        "image_height": 180,
                         "rotation": 0
                     }
                 ]
             },
-            "BoxArtBigger": {
+            "BoxArtBig": {
                 "canvas_size": {
                     "height": 1024,
                     "width": 1024
@@ -366,98 +358,98 @@ class generate:
                     {
                         "name": "image1",
                         "image_x": 0,
-                        "image_y": 606,
-                        "image_width": 262,
-                        "image_height": 418,
+                        "image_y": 0,
+                        "image_width": 260,
+                        "image_height": 412,
                         "rotation": 0
                     },
                     {
                         "name": "image2",
-                        "image_x": 262,
-                        "image_y": 606,
-                        "image_width": 251,
-                        "image_height": 418,
+                        "image_x": 259,
+                        "image_y": 0,
+                        "image_width": 254,
+                        "image_height": 412,
                         "rotation": 0
                     },
                     {
                         "name": "image3",
-                        "image_x": 512,
-                        "image_y": 606,
-                        "image_width": 256,
-                        "image_height": 418,
+                        "image_x": 513,
+                        "image_y": 0,
+                        "image_width": 253,
+                        "image_height": 412,
                         "rotation": 0
                     },
                     {
                         "name": "image4",
-                        "image_x": 768,
-                        "image_y": 606,
-                        "image_width": 256,
-                        "image_height": 418,
+                        "image_x": 766,
+                        "image_y": 0,
+                        "image_width": 258,
+                        "image_height": 420,
                         "rotation": 0
                     },
                     {
                         "name": "image5",
                         "image_x": 0,
-                        "image_y": 228,
+                        "image_y": 412,
                         "image_width": 248,
-                        "image_height": 381,
+                        "image_height": 384,
                         "rotation": 0
                     },
                     {
                         "name": "image6",
-                        "image_x": 246,
-                        "image_y": 228,
-                        "image_width": 228,
-                        "image_height": 381,
+                        "image_x": 247,
+                        "image_y": 412,
+                        "image_width": 227,
+                        "image_height": 384,
                         "rotation": 0
                     },
                     {
                         "name": "image7",
                         "image_x": 474,
-                        "image_y": 228,
-                        "image_width": 228,
-                        "image_height": 381,
+                        "image_y": 412,
+                        "image_width": 230,
+                        "image_height": 384,
                         "rotation": 0
                     },
                     {
                         "name": "image8",
-                        "image_x": 702,
-                        "image_y": 402,
-                        "image_width": 200,
+                        "image_x": 703,
+                        "image_y": 420,
+                        "image_width": 202,
                         "image_height": 321,
-                        "rotation": 90
+                        "rotation": 270
                     },
                     {
                         "name": "image9",
-                        "image_x": 702,
-                        "image_y": 203,
-                        "image_width": 200,
-                        "image_height": 321,
-                        "rotation": 90
+                        "image_x": 698,
+                        "image_y": 622,
+                        "image_width": 202,
+                        "image_height": 330,
+                        "rotation": 270
                     },
                     {
                         "name": "image10",
-                        "image_x": 702,
-                        "image_y": 0,
-                        "image_width": 200,
-                        "image_height": 321,
-                        "rotation": 90
+                        "image_x": 698,
+                        "image_y": 818,
+                        "image_width": 210,
+                        "image_height": 330,
+                        "rotation": 270
                     },
                     {
                         "name": "image11",
                         "image_x": 0,
-                        "image_y": 0,
+                        "image_y": 796,
                         "image_width": 228,
-                        "image_height": 349,
-                        "rotation": 90
+                        "image_height": 347,
+                        "rotation": 270
                     },
                     {
                         "name": "image12",
-                        "image_x": 350,
-                        "image_y": 0,
+                        "image_x": 347,
+                        "image_y": 796,
                         "image_width": 228,
-                        "image_height": 356,
-                        "rotation": 90
+                        "image_height": 351,
+                        "rotation": 270
                     }
                 ]
             }

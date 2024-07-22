@@ -6,11 +6,10 @@ class config():
             self.config = load(file)
     
     def BoxArt1(self):
-        test = "here"
         return self.config["BoxArt1"]
 
     def BoxArt2(self):
         return self.config["BoxArt2"]
     
-    def BoxArtBigger(self):
-        return self.config["BoxArtBigger"]
+    def BoxArtBig(self):
+        return self.config["BoxArtBig"]
