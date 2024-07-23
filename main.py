@@ -9,6 +9,7 @@ import os
 from collections import Counter
 import threading
 import argparse
+from tkinter.ttk import Progressbar
 
 def argCheck(arg: str) -> str:
     mod_name = arg.replace(" ", "_").lower()
@@ -69,6 +70,7 @@ def BoxArt(mod_name: str, images: list):
 
         thread_counter = 0
         threads = []
+
         for cover_data in file["positions"]:
             cover_image = images[thread_counter]
             t = threading.Thread(target = place_covers, args = (cover_data, canvas, file_name, cover_image))

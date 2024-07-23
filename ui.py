@@ -1,5 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, StringVar, filedialog
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, StringVar, filedialog, simpledialog, Toplevel
 from tkinter.ttk import Progressbar
 from os import getcwd
 
@@ -46,13 +46,13 @@ class ui():
         self.image_list = []
         self.window = Tk()
 
-        self.window.geometry("936x600")
+        self.window.geometry("936x570")
         self.window.configure(bg = "#FEF7FF")
 
         self.canvas = Canvas(
             self.window,
             bg = "#FEF7FF",
-            height = 600,
+            height = 570,
             width = 936,
             bd = 0,
             highlightthickness = 0,
@@ -82,9 +82,13 @@ class ui():
         # Start button
         self.startButton()
 
+        #self.complete()
+        #self.modEntry()
+        self.restartButton()
+
         self.counter_text = self.canvas.create_text(
             48,
-            490,
+            530,
             anchor = "center",
             text = f"{self.image_count}/53",
             fill = "#000000",
@@ -112,23 +116,28 @@ class ui():
 
             if self.image_count >= 53:
                 self.start_button.config(state = "normal")
-                self.modEntry()
+                #self.modEntry()
 
             if self.thumbnail_x_offset == 770:
                 self.thumbnail_x_offset = 0
                 self.thumbnail_y_offset += 125
 
             if self.thumbnail_y_offset == 375:
-                y_scroll = Scrollbar(self.inner_canvas, orient = "vertical", command = self.inner_canvas.yview)
-                y_scroll.place(x = 806, y = 0, height = 530)
+                self.y_scroll = Scrollbar(self.inner_canvas, orient = "vertical", command = self.inner_canvas.yview)
+                self.y_scroll.place(x = 806, y = 0, height = 530)
 
-                self.inner_canvas.config(yscrollcommand = y_scroll.set)
+                self.inner_canvas.config(yscrollcommand = self.y_scroll.set)
             
             if self.thumbnail_y_offset >= 375:
                 self.inner_canvas.config(scrollregion = (0, 0, 0, self.thumbnail_y_offset + 150))
 
             self.addThumbnail(self.thumbnail_x_offset, self.thumbnail_y_offset, file)
             self.thumbnail_x_offset += 110
+
+        #for x in self.image_display():
+        #    x = None
+
+        #self.inner_canvas.delete("all")
 
     def addThumbnail(self, thumbnail_x_offset: int, thumbnail_y_offset: int, file):
         #image = Image.open("assets/frame0/image_preview.png")
@@ -175,6 +184,7 @@ class ui():
             fill = "#000000",
             font = ("Roboto", 11 * -1)
             )
+        
 
     def menuButton(self):
         image = PhotoImage(
@@ -206,7 +216,7 @@ class ui():
         w = Canvas(self.window)
         w.image = image
         
-        button_2 = Button(
+        self.upload_button = Button(
             image = w.image,
             borderwidth = 0,
             highlightthickness = 0,
@@ -216,7 +226,7 @@ class ui():
             activebackground = "#FEF7FF"
         )
 
-        button_2.place(
+        self.upload_button.place(
             x = 23.0,
             y = 77.0,
             width = 55.0,
@@ -237,7 +247,7 @@ class ui():
             image = w.image,
             borderwidth = 0,
             highlightthickness = 0,
-            command = self.start,
+            command = self.startFunction,
             relief = "flat",
             bg = "#FEF7FF",
             state = "disabled",
@@ -246,26 +256,107 @@ class ui():
 
         self.start_button.place(
             x = 23,
-            y = 500,
+            y = 135,
             width = 55,
             height = 55
         )
     
-    def start(self):
-        mod_name = self.mod_name_var.get()
+    def startFunction(self):
+        #mod_name = self.mod_name_var.get()
+        #if mod_name == "":
+        #    messagebox.showerror("Mod Name Needed", "Name your mod, it's required to create the directory.")
+        #    return
 
-        self.progressbar = Progressbar(orient = "horizontal", length = 500)
-        self.progressbar.place(x = 394, y = 563, width = 500, height = 30)
+        self.upload_button.config(state = "disabled")
+        self.start_button.config(state = "disabled")
+        #BoxArt(mod_name, self.image_list)
 
-        BoxArt(mod_name, self.image_list)
+        self.modEntry()
+        
+        self.completeFunction()
 
+    def completeFunction(self):
+        image = Image.open(relative_to_assets("done.png"))
+        image = image.resize((55, 55))
+        image = ImageTk.PhotoImage(image)
+        
+        w = Canvas(self.window)
+        w.image = image
+
+
+        self.complete_image = Label(self.canvas, image = w.image, background = "#FEF7FF")
+        self.complete_image.place(
+            x = 20,
+            y = 430
+        )
+
+        #self.canvas.create_image(
+        #        50,
+        #        430,
+        #        image = w.image
+        #)
+
+        self.restart_button.config(state = "normal")
+        self.start_button.config(state = "disabled")
+    
+    def restartButton(self):
+        image = Image.open(relative_to_assets("restart.png"))
+        image = image.resize((55, 55))
+        image = ImageTk.PhotoImage(image)
+        
+        w = Canvas(self.window)
+        w.image = image
+
+        self.restart_button = Button(
+            image = w.image,
+            borderwidth = 0,
+            highlightthickness = 0,
+            command = self.restartFunction,
+            relief = "flat",
+            bg = "#FEF7FF",
+            state = "disabled",
+            activebackground = "#FEF7FF"
+        )
+
+        self.restart_button.place(
+            x = 23,
+            y = 193,
+            width = 55,
+            height = 55
+        )
+    
+    def restartFunction(self):
+        self.inner_canvas.delete("all")
+
+        self.thumbnail_x_offset = 0
+        self.thumbnail_y_offset = 0
+        self.image_count = 0
+        self.image_list = []
+
+        self.upload_button.config(state = "normal")
+        self.restart_button.config(state = "disabled")
+
+        self.canvas.itemconfig(self.counter_text, text = "0/53")
+
+        self.inner_canvas.config(yscrollcommand = None)
+        self.inner_canvas.config(scrollregion = (0, 0, 0, 0))
+
+        self.complete_image.destroy()
+        #self.y_scroll.destroy()
 
     def modEntry(self):
-        self.mod_name_var = StringVar()
+        top = Toplevel(self.window)
+        top.geometry("750x250")
+        entry = Entry(top, width= 25)
+        entry.pack()
+        
+        #mod_name = simpledialog.askstring(title="Mod Name Entry", prompt="What's your mod called?:")
+        
+        #self.mod_name_var = StringVar()
 
-        name_label = Label(self.canvas, text = "Mod Name", font = ("Roboto", 18 * -1, "bold"), anchor = "center", background = "#FEF7FF")
-        name_label.place(x = 87, y = 563)
-        name_entry = Entry(self.canvas, textvariable = self.mod_name_var, font = ("Roboto", 18 * -1), width = 17)
-        name_entry.place(x = 190, y = 563)
+        #name_label = Label(self.canvas, text = "Mod Name", font = ("Roboto", 18 * -1, "bold"), anchor = "center", background = "#FEF7FF")
+        #name_label.place(x = 87, y = 563)
+        #name_entry = Entry(self.canvas, textvariable = self.mod_name_var, font = ("Roboto", 18 * -1), width = 17)
+        #name_entry.place(x = 190, y = 563)
 
 ui()
