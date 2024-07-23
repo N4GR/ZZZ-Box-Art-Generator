@@ -12,7 +12,6 @@ class generate:
                     "height": 1024,
                     "width": 1024
                 },
-
                 "positions": [
                     {
                         "name": "image1",
@@ -62,7 +61,6 @@ class generate:
                         "image_height": 178,
                         "rotation": 0
                     },
-
                     {
                         "name": "image7",
                         "image_x": 0,
@@ -111,7 +109,6 @@ class generate:
                         "image_height": 178,
                         "rotation": 0
                     },
-
                     {
                         "name": "image13",
                         "image_x": 0,
@@ -160,7 +157,6 @@ class generate:
                         "image_height": 178,
                         "rotation": 0
                     },
-
                     {
                         "name": "image19",
                         "image_x": 0,
@@ -209,7 +205,6 @@ class generate:
                         "image_height": 178,
                         "rotation": 0
                     },
-
                     {
                         "name": "image25",
                         "image_x": 0,
@@ -252,7 +247,6 @@ class generate:
                     }
                 ]
             },
-
             "BoxArt2": {
                 "canvas_size": {
                     "height": 1024,
@@ -288,7 +282,7 @@ class generate:
                         "image_x": 538,
                         "image_y": 248,
                         "image_width": 142,
-                        "image_height": 202, 
+                        "image_height": 202,
                         "rotation": 0
                     },
                     {

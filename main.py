@@ -10,7 +10,7 @@ from collections import Counter
 import threading
 import argparse
 
-def argCheck(arg: str) -> dict[str | int]:
+def argCheck(arg: str) -> str:
     mod_name = arg.replace(" ", "_").lower()
     mod_path = f"mods/{mod_name}"
 
@@ -20,7 +20,7 @@ def argCheck(arg: str) -> dict[str | int]:
         return mod_name
     else:
         print(logging().error(f"[mods/{mod_name}] already exists, use a different mod name or delete the old mod directory."))
-        os.abort()
+        return
 
 def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
     def botbar():
@@ -40,19 +40,19 @@ def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
     botbar()
 
 def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: str):
-    print(logging().note(f"Processing [images/{cover_image}]."))
-    image_directory = f"images/{cover_image}"
-    cover = Image.open(image_directory)
+    print(logging().note(f"Processing [{cover_image}]."))
+    cover = Image.open(cover_image)
     cover = cover.resize((cover_data["image_width"], cover_data["image_height"]), Image.Resampling.LANCZOS)
     cover = cover.rotate(cover_data["rotation"], expand = True)
 
     canvas.paste(cover, (cover_data["image_x"], cover_data["image_y"]))
-    print(logging().success(f"Processed [images/{cover_image}]."))
+    print(logging().success(f"Processed [{cover_image}]."))
 
     if file_name == "BoxArt1": BoxArt1(canvas, cover_data, cover)
 
 def BoxArt(mod_name: str, images: list):
     mod_path = f"mods/{mod_name}"
+    mod_name = argCheck(mod_name)
 
     conf = config()
 
@@ -95,15 +95,15 @@ def BoxArt(mod_name: str, images: list):
     
     generate.ini(mod_path, mod_name)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Process the --name argument.")
-    parser.add_argument("--name", type=str, required=True, help="Name of the mod")
+#if __name__ == "__main__":
+#    parser = argparse.ArgumentParser(description="Process the --name argument.")
+#    parser.add_argument("--name", type=str, required=True, help="Name of the mod")
 
-    args = parser.parse_args()
+#    args = parser.parse_args()
     
-    check = checks()
+#    check = checks()
 
-    if check is False:
-        os.abort()
-    else:
-        BoxArt(argCheck(args.name), check)
+#    if check is False:
+#        os.abort()
+#    else:
+#        BoxArt(argCheck(args.name), check)
