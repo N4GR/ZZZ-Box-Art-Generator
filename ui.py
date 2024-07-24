@@ -13,6 +13,8 @@ from PIL import Image, ImageTk, ImageDraw
 
 from main import BoxArt
 
+import webbrowser
+
 ASSETS_PATH = Path(fr"{getcwd()}\\assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -73,6 +75,8 @@ class ui():
         self.image_count = 0
         self.image_list = []
 
+        self.about_conf = versioning()
+
         self.window = Tk()
         self.window.title("N4GR - ZZZ Box Art Generator")
 
@@ -80,6 +84,7 @@ class ui():
         self.background_colour = "#FEF7FF"
         self.preview_window_colour = "#FFFFFF"
         self.text_colour = "#2c2d30"
+        self.about_flash_colour = "#FF69B4"
 
         self.window_height = 570
         self.window_width = 936
@@ -127,6 +132,7 @@ class ui():
 
         self.aboutPage()
 
+        # File counter to count how many images have been inputted.
         self.counter_text = self.canvas.create_text(
             48,
             530,
@@ -136,6 +142,19 @@ class ui():
             font = ("Roboto", 20 * -1, "bold")
         )
         
+        # Version label
+        version_label = Label(
+            self.canvas, 
+            text = f"{self.about_conf.getCreator()} - {self.about_conf.getVersion()}", 
+            font = ("Roboto", 10, "bold"), 
+            background = self.background_colour, 
+            anchor = "w",
+            foreground = self.text_colour
+        )
+
+        version_label.place(x = 840, y = 552)
+
+        # Loop start
         self.window.mainloop()
     
     def center_window(self, root: Tk, width: int, height: int):
@@ -534,22 +553,104 @@ class ui():
         load_animation.place(x = 0, y = 200)
 
         def flash_text():
-            current_color = label.cget("foreground")
-            next_color = "red" if current_color == "black" else "black"
-            label.config(foreground=next_color)
+            current_color = flashing_author.cget("foreground")
+            next_color = self.about_flash_colour if current_color == "black" else "black"
+            flashing_author.config(foreground=next_color)
             about_canvas.after(500, flash_text)  # Schedule the function to be called again after 500 milliseconds
 
         # Add a label widget
-        label = Label(
+        flashing_author = Label(
             about_canvas, 
-            text="Flashing Text", 
-            font=("Roboto", 30, "bold"), 
+            text = self.about_conf.getCreator(), 
+            font = ("Roboto", 30, "bold"), 
             background = self.background_colour, 
             anchor = "center"
         )
-        
-        label.place(x = 150, y = 150)
+
+        flashing_author.place(x = 90, y = 30)
 
         flash_text()
+
+        github_image = createButton(55, 55, self.button_background_colour, "github.png")
+    
+        w = Canvas(about_root)
+        w.github_image = github_image
+
+        github_button = Button(
+            master = about_canvas,
+            image = w.github_image,
+            borderwidth = 0,
+            highlightthickness = 0,
+            command = browsing.openGitHub,
+            relief = "flat",
+            bg = self.background_colour,
+            state = "normal",
+            activebackground = self.background_colour
+        )
+
+        github_button.place(
+            x = 90,
+            y = 140,
+            width = 55,
+            height = 55
+        )
+
+        kofi_image = createButton(55, 55, self.button_background_colour, "ko-fi.png")
+    
+        w = Canvas(about_root)
+        w.kofi_image = kofi_image
+
+        kofi_button = Button(
+            master = about_canvas,
+            image = w.kofi_image,
+            borderwidth = 0,
+            highlightthickness = 0,
+            command = browsing.openKoFi,
+            relief = "flat",
+            bg = self.background_colour,
+            state = "normal",
+            activebackground = self.background_colour
+        )
+
+        kofi_button.place(
+            x = 150,
+            y = 140,
+            width = 55,
+            height = 55
+        )
+
+        paypal_image = createButton(110, 55, self.button_background_colour, "paypal.png")
+    
+        w = Canvas(about_root)
+        w.paypal_image = paypal_image
+
+        paypal_button = Button(
+            master = about_canvas,
+            image = w.paypal_image,
+            borderwidth = 0,
+            highlightthickness = 0,
+            command = browsing.openPayPal,
+            relief = "flat",
+            bg = self.background_colour,
+            state = "normal",
+            activebackground = self.background_colour
+        )
+
+        paypal_button.place(
+            x = 91,
+            y = 80,
+            width = 110,
+            height = 55
+        )
+
+class browsing:
+    def openPayPal():
+        webbrowser.open(url = "https://www.paypal.me/n4gr")
+    
+    def openKoFi():
+        webbrowser.open(url = "https://ko-fi.com/n4gr_")
+
+    def openGitHub():
+        webbrowser.open(url = "https://github.com/N4GR")
 
 ui()
