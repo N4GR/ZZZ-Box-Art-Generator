@@ -13,3 +13,20 @@ class config():
     
     def BoxArtBig(self):
         return self.config["BoxArtBig"]
+
+class versioning():
+    def __init__(self) -> None:
+        with open("version.json") as file:
+            self.data = load(file)
+    
+    def getVersion(self) -> str:
+        return self.data["version"]
+
+    def getCreator(self) -> str:
+        return self.data["creator"]
+    
+    def getProfile(self) -> str:
+        return self.data["profile"]
+    
+    def getRepo(self) -> str:
+        return self.data["repo"]

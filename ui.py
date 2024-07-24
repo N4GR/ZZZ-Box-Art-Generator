@@ -1,12 +1,15 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, StringVar, filedialog, simpledialog, Toplevel
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, filedialog, Toplevel, END, messagebox, OptionMenu, StringVar
 from tkinter.ttk import Progressbar
 from os import getcwd
+from itertools import count
+
+from config import versioning
 
 from startup import checks
 checks()
 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageDraw
 
 from main import BoxArt
 
@@ -14,46 +17,83 @@ ASSETS_PATH = Path(fr"{getcwd()}\\assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
-def round_rectangle(canvas: Canvas, x1, y1, x2, y2, radius=25, **kwargs):
-    points = [x1+radius, y1,
-              x1+radius, y1,
-              x2-radius, y1,
-              x2-radius, y1,
-              x2, y1,
-              x2, y1+radius,
-              x2, y1+radius,
-              x2, y2-radius,
-              x2, y2-radius,
-              x2, y2,
-              x2-radius, y2,
-              x2-radius, y2,
-              x1+radius, y2,
-              x1+radius, y2,
-              x1, y2,
-              x1, y2-radius,
-              x1, y2-radius,
-              x1, y1+radius,
-              x1, y1+radius,
-              x1, y1]
+def createButton(width: int, height: int, colour: str, file_name: str, flip = False):
+    image = Image.new("RGBA", (width, height))
+    image_draw = ImageDraw.Draw(image)
+    image_draw.rounded_rectangle((0, 0, width, height), fill = colour, width = 3, radius = round(((width + height) / 2) / 4))
 
-    return canvas.create_polygon(points, **kwargs, smooth=True)
+    pasting_image = Image.open(relative_to_assets(file_name)).resize((width, height))
+    image.paste(pasting_image, (0, 0), pasting_image)
+
+    if flip: image = image.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+
+    return ImageTk.PhotoImage(image)
+
+class ImageLabel(Label):
+    """a label that displays images, and plays them if they are gifs"""
+    def load(self, im):
+        if isinstance(im, str):
+            im = Image.open(im)
+        self.loc = 0
+        self.frames = []
+
+        try:
+            for i in count(1):
+                self.frames.append(ImageTk.PhotoImage(im.copy()))
+                im.seek(i)
+        except EOFError:
+            pass
+
+        try:
+            self.delay = im.info['duration']
+        except:
+            self.delay = 100
+
+        if len(self.frames) == 1:
+            self.config(image=self.frames[0])
+        else:
+            self.next_frame()
+
+    def unload(self):
+        self.config(image="")
+        self.frames = None
+
+    def next_frame(self):
+        if self.frames:
+            self.loc += 1
+            self.loc %= len(self.frames)
+            self.config(image=self.frames[self.loc])
+            self.after(self.delay, self.next_frame)
 
 class ui():
     def __init__(self) -> None:
         self.thumbnail_x_offset = 0
         self.thumbnail_y_offset = 0
+        self.warn_count = 0
         self.image_count = 0
         self.image_list = []
-        self.window = Tk()
 
-        self.window.geometry("936x570")
-        self.window.configure(bg = "#FEF7FF")
+        self.window = Tk()
+        self.window.title("N4GR - ZZZ Box Art Generator")
+
+        self.button_background_colour = "#FFFFFF"
+        self.background_colour = "#FEF7FF"
+        self.preview_window_colour = "#FFFFFF"
+        self.text_colour = "#2c2d30"
+
+        self.window_height = 570
+        self.window_width = 936
+        self.window.geometry(f"{self.window_width}x{self.window_height}")
+        self.window.configure(bg = self.background_colour)
+        self.window.resizable(False, False)
+
+        self.center_window(self.window, self.window_width, self.window_height)
 
         self.canvas = Canvas(
             self.window,
-            bg = "#FEF7FF",
-            height = 570,
-            width = 936,
+            bg = self.background_colour,
+            height = self.window_height,
+            width = self.window_width,
             bd = 0,
             highlightthickness = 0,
             relief = "ridge"
@@ -61,10 +101,10 @@ class ui():
         self.canvas.place(x = 0, y = 0)
 
         #rounded_rect = round_rectangle(self.canvas, 0, 0, 823, 532, radius = 25, fill = "#FFFFFF")
-
+        
         self.inner_canvas = Canvas(
             self.canvas,
-            bg = "#FFFFFF",
+            bg = self.preview_window_colour,
             width = 823, 
             height = 530,
             bd = 0,
@@ -82,21 +122,31 @@ class ui():
         # Start button
         self.startButton()
 
-        #self.complete()
-        #self.modEntry()
+        # Restart button
         self.restartButton()
+
+        self.aboutPage()
 
         self.counter_text = self.canvas.create_text(
             48,
             530,
             anchor = "center",
             text = f"{self.image_count}/53",
-            fill = "#000000",
+            fill = self.text_colour,
             font = ("Roboto", 20 * -1, "bold")
         )
-
-        self.window.resizable(False, False)
+        
         self.window.mainloop()
+    
+    def center_window(self, root: Tk, width: int, height: int):
+        # get screen width and height
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        # calculate position x and y coordinates
+        x = (screen_width/2) - (width/2)
+        y = (screen_height/2) - (height/2)
+        root.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
     def openImage(self):
         file_types = [
@@ -185,7 +235,6 @@ class ui():
             font = ("Roboto", 11 * -1)
             )
         
-
     def menuButton(self):
         image = PhotoImage(
             file=relative_to_assets("button_1.png"))
@@ -197,10 +246,10 @@ class ui():
             image = w.image,
             borderwidth = 0,
             highlightthickness = 0,
-            command = lambda: print("button_1 clicked"),
+            command = self.aboutPage,
             relief = "flat",
-            bg = "#FEF7FF",
-            activebackground = "#FEF7FF"
+            bg = self.background_colour,
+            activebackground = self.background_colour
         )
 
         button_1.place(
@@ -211,19 +260,19 @@ class ui():
         )
 
     def uploadButton(self):
-        image = PhotoImage(file = relative_to_assets("button_2.png"))
-
+        image = createButton(55, 55, self.button_background_colour, "button_upload.png")
+        
         w = Canvas(self.window)
         w.image = image
-        
+
         self.upload_button = Button(
             image = w.image,
             borderwidth = 0,
             highlightthickness = 0,
             command = self.openImage,
             relief = "flat",
-            bg = "#FEF7FF",
-            activebackground = "#FEF7FF"
+            bg = self.background_colour,
+            activebackground = self.background_colour
         )
 
         self.upload_button.place(
@@ -234,11 +283,7 @@ class ui():
         )
 
     def startButton(self):
-        #image = PhotoImage(file = relative_to_assets("play.png"))
-
-        image = Image.open(relative_to_assets("play.png"))
-        image = image.resize((55, 55))
-        image = ImageTk.PhotoImage(image)
+        image = createButton(55, 55, self.button_background_colour, "button_play.png")
         
         w = Canvas(self.window)
         w.image = image
@@ -249,9 +294,9 @@ class ui():
             highlightthickness = 0,
             command = self.startFunction,
             relief = "flat",
-            bg = "#FEF7FF",
+            bg = self.background_colour,
             state = "disabled",
-            activebackground = "#FEF7FF"
+            activebackground = self.background_colour
         )
 
         self.start_button.place(
@@ -271,9 +316,11 @@ class ui():
         self.start_button.config(state = "disabled")
         #BoxArt(mod_name, self.image_list)
 
+        self.window.wm_state("iconic")
+
         self.modEntry()
         
-        self.completeFunction()
+        #self.completeFunction()
 
     def completeFunction(self):
         image = Image.open(relative_to_assets("done.png"))
@@ -283,27 +330,17 @@ class ui():
         w = Canvas(self.window)
         w.image = image
 
+        self.load_animation.destroy()
 
-        self.complete_image = Label(self.canvas, image = w.image, background = "#FEF7FF")
-        self.complete_image.place(
-            x = 20,
-            y = 430
-        )
-
-        #self.canvas.create_image(
-        #        50,
-        #        430,
-        #        image = w.image
-        #)
+        self.complete_image = Label(self.canvas, image = w.image, background = self.background_colour)
+        self.complete_image.place(x = 23, y = 430)
 
         self.restart_button.config(state = "normal")
         self.start_button.config(state = "disabled")
     
     def restartButton(self):
-        image = Image.open(relative_to_assets("restart.png"))
-        image = image.resize((55, 55))
-        image = ImageTk.PhotoImage(image)
-        
+        image = createButton(55, 55, self.button_background_colour, "button_restart.png")
+
         w = Canvas(self.window)
         w.image = image
 
@@ -313,9 +350,9 @@ class ui():
             highlightthickness = 0,
             command = self.restartFunction,
             relief = "flat",
-            bg = "#FEF7FF",
+            bg = self.background_colour,
             state = "disabled",
-            activebackground = "#FEF7FF"
+            activebackground = self.background_colour
         )
 
         self.restart_button.place(
@@ -345,18 +382,174 @@ class ui():
         #self.y_scroll.destroy()
 
     def modEntry(self):
-        top = Toplevel(self.window)
-        top.geometry("750x250")
-        entry = Entry(top, width= 25)
-        entry.pack()
-        
-        #mod_name = simpledialog.askstring(title="Mod Name Entry", prompt="What's your mod called?:")
-        
-        #self.mod_name_var = StringVar()
+        window_height = 240
+        window_width = 280
+        self.entry_root = Toplevel(self.window)
+        self.entry_root.resizable(False, False)
+        #entry_root.overrideredirect(True)
 
-        #name_label = Label(self.canvas, text = "Mod Name", font = ("Roboto", 18 * -1, "bold"), anchor = "center", background = "#FEF7FF")
-        #name_label.place(x = 87, y = 563)
-        #name_entry = Entry(self.canvas, textvariable = self.mod_name_var, font = ("Roboto", 18 * -1), width = 17)
-        #name_entry.place(x = 190, y = 563)
+        self.center_window(self.entry_root, window_width, window_height)
+
+        self.entry_canvas = Canvas(
+            self.entry_root,
+            bg = self.background_colour,
+            height = 240,
+            width = 280,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "ridge"
+        )
+        self.entry_canvas.place(x = 0, y = 0)
+        
+        Label(self.entry_canvas, text = "Mod Name:", font = ("Roboto", 18 * -1), anchor = "center", foreground = self.text_colour, background = self.background_colour).place(relx = 0.5, x = -45, y = 40, anchor = "center")
+        self.mod_name_entry = Entry(self.entry_canvas, width = 30)
+        self.mod_name_entry.place(relx = 0.5, y = 60, anchor = "center")
+
+        Label(self.entry_canvas, text = "Export Directory:", font = ("Roboto", 18 * -1), anchor = "center", foreground = self.text_colour, background = self.background_colour).place(relx = 0.5, x = -25, y = 102, anchor = "center")
+        self.exp_dir_entry = Entry(self.entry_canvas, width = 30)
+        self.exp_dir_entry.place(relx = 0.5, y = 127, anchor = "center")
+        self.exp_dir_entry.insert(0, f"{getcwd()}/mods")
+
+        # Creating two buttons
+        button_image = ("button_cancel.png", "button_play.png")
+        command = [self.modEntryCancel, self.modEntryCheck]
+        for x in range(2):
+            image = createButton(55, 55, self.button_background_colour, button_image[x])
+            w = Canvas(self.entry_canvas)
+            w.image = image
+
+            entry_start_button = Button(
+                self.entry_root,
+                image = w.image,
+                borderwidth = 0,
+                highlightthickness = 0,
+                command = command[x],
+                relief = "flat",
+                bg = self.background_colour,
+                state = "normal",
+                activebackground = self.background_colour
+            )
+
+            entry_start_button.place(relx = 0.5, x = 40 if x == 1 else -40, y = 190, anchor = "center", width = 55, height = 55)
+
+        image = createButton(20, 20, self.button_background_colour, "dir_select.png")
+        w = Canvas(self.entry_canvas)
+        w.image = image
+
+        dir_entry_button = Button(
+            self.entry_root,
+            image = w.image,
+            borderwidth = 0,
+            highlightthickness = 0,
+            command = self.modEntryDirSelect,
+            relief = "flat",
+            bg = self.background_colour,
+            state = "normal",
+            activebackground = self.background_colour
+        )
+
+        dir_entry_button.place(relx = 0.5, x = 100, y = 127, anchor = "center", width = 20, height = 20)
+
+    def modEntryDirSelect(self):
+        directory = filedialog.askdirectory()
+
+        self.exp_dir_entry.delete(0, END)
+        self.exp_dir_entry.insert(0, directory)
+
+        self.mod_directory = directory
+
+    def modEntryCancel(self):
+        self.entry_root.destroy()
+        self.upload_button.config(state = "normal")
+        self.start_button.config(state = "normal")
+
+    def modEntryCheck(self):
+        mod_name = self.mod_name_entry.get()
+        expo_dir = self.exp_dir_entry.get()
+
+        passing = True
+
+        warning_image = Image.open(relative_to_assets("warning.png")).resize((20, 20))
+        warning_image = ImageTk.PhotoImage(warning_image)
+        w = Canvas(self.entry_canvas)
+        w.image = warning_image
+
+        def placeWarning(y: int):
+            warning_mod_name = Label(self.entry_root, image = w.image, background = self.background_colour)
+            warning_mod_name.place(relx = 0.5, x = -110, y = y, anchor = "center", width = 20, height = 20)
+
+            self.warn_count += 1
+
+        def warnCheck(error_message: str):
+            if self.warn_count > 1:
+                messagebox.showerror("No Entry", error_message)
+                self.warn_count = 0
+
+        iter_count = 0
+        warning_text = ["Missing mod name.", "Missing directory entry."]
+        for entry in [mod_name, expo_dir]:
+            if entry == "":
+                warnCheck(warning_text[iter_count])
+                placeWarning(60 if iter_count == 0 else 127)
+                passing = False
+            iter_count += 1
+
+        if passing is True: self.entryPass()
+    
+    def entryPass(self):
+        mod_name = self.mod_name_entry.get()
+        export_directory = self.exp_dir_entry.get()
+        self.entry_root.destroy()
+
+        self.window.deiconify()
+
+        self.load_animation = ImageLabel(self.canvas, background = self.background_colour)
+        self.load_animation.load("assets/loading.gif")
+        self.load_animation.place(x = 23, y = 430)
+
+        BoxArt(mod_name, self.image_list, export_directory)
+        self.completeFunction()
+
+    def aboutPage(self):
+        window_height = 300
+        window_width = 300
+        about_root = Toplevel(self.window)
+        about_root.resizable(False, False)
+
+        self.center_window(about_root, window_width, window_height)
+
+        about_canvas = Canvas(
+            about_root,
+            bg = self.background_colour,
+            height = window_height,
+            width = window_height,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "ridge"
+        )
+        about_canvas.place(x = 0, y = 0)
+        
+        load_animation = ImageLabel(about_root, background = self.background_colour)
+        load_animation.load("assets/about_bot.gif")
+        load_animation.place(x = 0, y = 200)
+
+        def flash_text():
+            current_color = label.cget("foreground")
+            next_color = "red" if current_color == "black" else "black"
+            label.config(foreground=next_color)
+            about_canvas.after(500, flash_text)  # Schedule the function to be called again after 500 milliseconds
+
+        # Add a label widget
+        label = Label(
+            about_canvas, 
+            text="Flashing Text", 
+            font=("Roboto", 30, "bold"), 
+            background = self.background_colour, 
+            anchor = "center"
+        )
+        
+        label.place(x = 150, y = 150)
+
+        flash_text()
 
 ui()

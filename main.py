@@ -11,13 +11,15 @@ import threading
 import argparse
 from tkinter.ttk import Progressbar
 
-def argCheck(arg: str) -> str:
+import subprocess
+
+def argCheck(arg: str, export_directory: str) -> str:
     mod_name = arg.replace(" ", "_").lower()
-    mod_path = f"mods/{mod_name}"
+    mod_path = f"{export_directory}/{mod_name}"
 
     if os.path.isdir(mod_path) is False:
-        generate.directory("mods", mod_name)
-        generate.directory(f"mods/{mod_name}", "previews")
+        generate.directory(export_directory, mod_name)
+        generate.directory(mod_path, "previews")
         return mod_name
     else:
         print(logging().error(f"[mods/{mod_name}] already exists, use a different mod name or delete the old mod directory."))
@@ -51,9 +53,9 @@ def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: s
 
     if file_name == "BoxArt1": BoxArt1(canvas, cover_data, cover)
 
-def BoxArt(mod_name: str, images: list):
-    mod_path = f"mods/{mod_name}"
-    mod_name = argCheck(mod_name)
+def BoxArt(mod_name: str, images: list, export_directory: str):
+    mod_name = argCheck(mod_name, export_directory)
+    mod_path = f"{export_directory}/{mod_name}"
 
     conf = config()
 
@@ -96,6 +98,8 @@ def BoxArt(mod_name: str, images: list):
         print(logging().success(f"Successfully saved [{mod_path}/previews/{file_name}.png] as preview."))
     
     generate.ini(mod_path, mod_name)
+    mod_path = mod_path.replace("/", "\\")
+    subprocess.call(fr'explorer /select, "{mod_path}\{mod_name}.ini"')
 
 #if __name__ == "__main__":
 #    parser = argparse.ArgumentParser(description="Process the --name argument.")

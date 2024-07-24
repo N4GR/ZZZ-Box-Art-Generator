@@ -42,7 +42,10 @@ def version_check():
         version_data = load(file)
 
     current_version = version_data["version"]
-    newest_version = response.json()["tag_name"]
+    try:
+        newest_version = response.json()["tag_name"]
+    except KeyError:
+        return True
 
     if current_version != newest_version:
         print(logging().error(f"Tool out of date... Your version: {current_version}, latest version: {newest_version}"))
