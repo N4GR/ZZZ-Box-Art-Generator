@@ -13,18 +13,6 @@ from tkinter.ttk import Progressbar
 
 import subprocess
 
-def argCheck(arg: str, export_directory: str) -> str:
-    mod_name = arg.replace(" ", "_").lower()
-    mod_path = f"{export_directory}/{mod_name}"
-
-    if os.path.isdir(mod_path) is False:
-        generate.directory(export_directory, mod_name)
-        generate.directory(mod_path, "previews")
-        return mod_name
-    else:
-        print(logging().error(f"[mods/{mod_name}] already exists, use a different mod name or delete the old mod directory."))
-        return
-
 def BoxArt1(canvas: Image.Image, cover_data: dict, cover: Image.Image):
     def botbar():
         # Pasting bottom bar
@@ -54,8 +42,18 @@ def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: s
     if file_name == "BoxArt1": BoxArt1(canvas, cover_data, cover)
 
 def BoxArt(mod_name: str, images: list, export_directory: str):
-    mod_name = argCheck(mod_name, export_directory)
+    #print(mod_name)
+    mod_name = mod_name.replace(" ", "_").lower()
+    #print(mod_name)
     mod_path = f"{export_directory}/{mod_name}"
+
+    #print(export_directory)
+    #print(mod_path)
+
+    #return
+
+    generate.directory(export_directory, mod_name)
+    generate.directory(mod_path, "previews")
 
     conf = config()
 
@@ -84,6 +82,7 @@ def BoxArt(mod_name: str, images: list, export_directory: str):
             thread.join()
 
         canvas = ImageOps.flip(canvas)
+        print(f"{mod_path}/previews/{file_name}.png")
         canvas.save(f"{mod_path}/previews/{file_name}.png")
         with image.Image(filename = f"{mod_path}/previews/{file_name}.png") as img:
             print(logging().note(f"Converting [{mod_path}/previews/{file_name}.png] to ddf..."))

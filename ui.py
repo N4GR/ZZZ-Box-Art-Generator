@@ -1,7 +1,7 @@
 from pathlib import Path
 from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, filedialog, Toplevel, END, messagebox, OptionMenu, StringVar
 from tkinter.ttk import Progressbar
-from os import getcwd
+from os import getcwd, path
 from itertools import count
 
 from config import versioning
@@ -73,6 +73,8 @@ class ui():
         self.thumbnail_y_offset = 0
         self.warn_count = 0
         self.image_count = 0
+        self.processing = False
+        self.complete_image_showing = False
         self.image_list = []
 
         self.about_conf = versioning()
@@ -337,11 +339,17 @@ class ui():
 
         self.window.wm_state("iconic")
 
+        if self.complete_image_showing is True:
+            self.complete_image.destroy()
+            self.complete_image_showing = False
+
         self.modEntry()
         
         #self.completeFunction()
 
     def completeFunction(self):
+        self.processing = False
+
         image = Image.open(relative_to_assets("done.png"))
         image = image.resize((55, 55))
         image = ImageTk.PhotoImage(image)
@@ -351,6 +359,7 @@ class ui():
 
         self.load_animation.destroy()
 
+        self.complete_image_showing = True
         self.complete_image = Label(self.canvas, image = w.image, background = self.background_colour)
         self.complete_image.place(x = 23, y = 430)
 
@@ -370,7 +379,7 @@ class ui():
             command = self.restartFunction,
             relief = "flat",
             bg = self.background_colour,
-            state = "disabled",
+            state = "normal",
             activebackground = self.background_colour
         )
 
@@ -390,21 +399,33 @@ class ui():
         self.image_list = []
 
         self.upload_button.config(state = "normal")
-        self.restart_button.config(state = "disabled")
+        #self.restart_button.config(state = "disabled")
+        self.start_button.config(state = "disabled")
 
         self.canvas.itemconfig(self.counter_text, text = "0/53")
 
         self.inner_canvas.config(yscrollcommand = None)
         self.inner_canvas.config(scrollregion = (0, 0, 0, 0))
 
-        self.complete_image.destroy()
+        if self.complete_image_showing is True:
+            self.complete_image.destroy()
+            self.complete_image_showing = False
         #self.y_scroll.destroy()
+
+    def closeModEntry(self):
+        self.entry_root.destroy()
+        self.window.deiconify()
+
+        if self.processing is False:
+            self.start_button.config(state = "normal")
+            self.upload_button.config(state = "normal")
 
     def modEntry(self):
         window_height = 240
         window_width = 280
         self.entry_root = Toplevel(self.window)
         self.entry_root.resizable(False, False)
+        self.entry_root.protocol("WM_DELETE_WINDOW", self.closeModEntry)
         #entry_root.overrideredirect(True)
 
         self.center_window(self.entry_root, window_width, window_height)
@@ -481,6 +502,7 @@ class ui():
         self.entry_root.destroy()
         self.upload_button.config(state = "normal")
         self.start_button.config(state = "normal")
+        self.window.deiconify()
 
     def modEntryCheck(self):
         mod_name = self.mod_name_entry.get()
@@ -511,22 +533,38 @@ class ui():
                 warnCheck(warning_text[iter_count])
                 placeWarning(60 if iter_count == 0 else 127)
                 passing = False
+
             iter_count += 1
+        
+        if passing is False: return
+        
+        new_name = mod_name.replace(" ", "_").lower()
+
+        if not path.isdir(expo_dir):
+            messagebox.showerror("Invalid Directory", "You need to add a valid directory.")
+            passing = False
+            return
+        elif path.isdir(f"{expo_dir}\\{new_name}"):
+            messagebox.showerror("Already Exists", "This mod directory already exists, pick a different name or export directory.")
+            passing = False
+            return
+        # CHECK DIRECTORY + MOD NAME
 
         if passing is True: self.entryPass()
     
     def entryPass(self):
         mod_name = self.mod_name_entry.get()
         export_directory = self.exp_dir_entry.get()
-        self.entry_root.destroy()
 
+        self.processing = True
+        self.entry_root.destroy()
         self.window.deiconify()
 
         self.load_animation = ImageLabel(self.canvas, background = self.background_colour)
         self.load_animation.load("assets/loading.gif")
         self.load_animation.place(x = 23, y = 430)
 
-        BoxArt(mod_name, self.image_list, export_directory)
+        #BoxArt(mod_name, self.image_list, export_directory)
         self.completeFunction()
 
     def aboutPage(self):
