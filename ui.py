@@ -261,7 +261,7 @@ class ui():
         w = Canvas(self.window)
         w.image = image
 
-        button_1 = Button(
+        self.menu_button = Button(
             image = w.image,
             borderwidth = 0,
             highlightthickness = 0,
@@ -271,7 +271,7 @@ class ui():
             activebackground = self.background_colour
         )
 
-        button_1.place(
+        self.menu_button.place(
             x = 36.0,
             y = 34.0,
             width = 24.0,
@@ -530,10 +530,19 @@ class ui():
         self.completeFunction()
 
     def aboutPage(self):
+        def enableAboutButton():
+            self.menu_button.config(state = "normal")
+            about_root.destroy()
+            self.window.deiconify()
+        
+        self.window.wm_state("iconic")
+        self.menu_button.config(state = "disabled")
+
         window_height = 300
         window_width = 300
         about_root = Toplevel(self.window)
         about_root.resizable(False, False)
+        about_root.protocol("WM_DELETE_WINDOW", enableAboutButton)
 
         self.center_window(about_root, window_width, window_height)
 
