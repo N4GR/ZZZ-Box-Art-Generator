@@ -564,7 +564,7 @@ class ui():
         self.load_animation.load("assets/loading.gif")
         self.load_animation.place(x = 23, y = 430)
 
-        #BoxArt(mod_name, self.image_list, export_directory)
+        BoxArt(mod_name, self.image_list, export_directory)
         self.completeFunction()
 
     def aboutPage(self):

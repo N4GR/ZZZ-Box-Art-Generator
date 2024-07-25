@@ -43,7 +43,8 @@ def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: s
 
 def BoxArt(mod_name: str, images: list, export_directory: str):
     #print(mod_name)
-    mod_name = mod_name.replace(" ", "_").lower()
+    mod_name = "".join(c for c in mod_name if c.isalpha() or c.isdigit() or c==' ').rstrip()
+    #mod_name = mod_name.replace(" ", "_").lower()
     #print(mod_name)
     mod_path = f"{export_directory}/{mod_name}"
 
