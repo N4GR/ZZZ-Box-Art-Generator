@@ -130,7 +130,7 @@ class ui():
         # Restart button
         self.restartButton()
 
-        self.aboutPage()
+        #self.aboutPage()
 
         # File counter to count how many images have been inputted.
         self.counter_text = self.canvas.create_text(
