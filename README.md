@@ -57,17 +57,14 @@ Using the tool is definitely easier than installing it, this section will guide 
 > [!NOTE]
 > Ensure the images are appropriately proportioned; a square image isn't going to look nice being stretched to a rectangle!
 
-2. Move the images into the images/ directory within the tool.
-3. Open the Terminal from within the main directory of the tool.
-4. To run the script, use the following command (replace mod-name with the name of your mod):
+4. To run the script, use the following command:
 ```
-python .\main.py --name "mod-name"
+python .\main.py
 ```
-5. Let the script do it's thing, once it's complete the program will end, looking like this:
-![success image](https://i.imgur.com/PkhSuCG.png)
-    - Note down any correct any errors shown to make the generation more seamless.
-
-6. Navigate to the mods/ folder within the tool's directory and you should see a folder with the name you given the tool, this folder should containg:
+5. Add your images to the UI using the + button, once all 53 images have been populated, the start button is displayed.
+6. Click on the start button and enter in your mod name and the directory you want the mod to export to.
+5. Let the script do it's thing, once it's complete you will see a green tick.
+6. Navigate to the export folder you selected and you should see a folder with the name you given the tool, this folder should containg:
 - Previews directory containing PNG previews.
 - DDS files.
 - Populated .ini file with hashes.
