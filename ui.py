@@ -1,6 +1,5 @@
 from pathlib import Path
-from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, filedialog, Toplevel, END, messagebox, OptionMenu, StringVar
-from tkinter.ttk import Progressbar
+from tkinter import Tk, Canvas, Entry, Button, PhotoImage, Scrollbar, Label, filedialog, Toplevel, END, messagebox
 from os import getcwd, path
 from itertools import count
 
@@ -12,8 +11,11 @@ checks()
 from PIL import Image, ImageTk, ImageDraw
 
 from main import BoxArt
+from log import logging
 
 import webbrowser
+
+import re
 
 ASSETS_PATH = Path(fr"{getcwd()}\\assets")
 def relative_to_assets(path: str) -> Path:
@@ -170,6 +172,17 @@ class ui():
         root.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
     def openImage(self):
+        def checkImage(file_name: str):
+            try:
+                with Image.open(file_name) as img:
+                    img.verify()
+
+                return True
+            except (IOError, SyntaxError) as error:
+                print(logging().error(error))
+
+                return False
+
         file_types = [
             ("Image files", "*.jpg *.jpeg *.png"),
         ]
@@ -178,16 +191,34 @@ class ui():
         if not files:
             return
 
-        for file in files:
-            self.image_list.append(file.name)
-            self.image_count += 1
-            self.canvas.itemconfig(self.counter_text, text = f"{self.image_count}/53")
+        invalid_files = []
 
-            #print(self.image_list, self.thumbnail_y_offset)
+        invalid_warning = False
+
+        for file in files:
+            self.image_count += 1 # Adds to image count
+
+            if self.image_count > 53: # If there's more than 53 images, stop this.
+                if invalid_warning is False:
+                    messagebox.showerror("Too many images", "You selected too many images, this won't have an effect on the outcome.")
+                    invalid_warning = True
+
+                continue
+
+            if checkImage(file.name) is False: # Checks if the image is valid and not corrupt.
+                invalid_files.append(file.name)
+                continue
+
+            if self.image_count == 53:
+                self.upload_button.config(state = "disabled")
+            
+            # Add image to image list
+            self.image_list.append(file.name)
+            
+            self.canvas.itemconfig(self.counter_text, text = f"{self.image_count}/53")
 
             if self.image_count >= 53:
                 self.start_button.config(state = "normal")
-                #self.modEntry()
 
             if self.thumbnail_x_offset == 770:
                 self.thumbnail_x_offset = 0
@@ -204,11 +235,11 @@ class ui():
 
             self.addThumbnail(self.thumbnail_x_offset, self.thumbnail_y_offset, file)
             self.thumbnail_x_offset += 110
-
-        #for x in self.image_display():
-        #    x = None
-
-        #self.inner_canvas.delete("all")
+        
+        if len(invalid_files) != 0:
+            invalid_files = [file_name.split("/")[-1] for file_name in invalid_files]
+            print(invalid_files)
+            messagebox.showerror("Invalid Image", f"You entered the invalid images:\n{''.join(file_name + "\n" for file_name in invalid_files)}")
 
     def addThumbnail(self, thumbnail_x_offset: int, thumbnail_y_offset: int, file):
         #image = Image.open("assets/frame0/image_preview.png")
@@ -333,7 +364,6 @@ class ui():
         #    messagebox.showerror("Mod Name Needed", "Name your mod, it's required to create the directory.")
         #    return
 
-        self.upload_button.config(state = "disabled")
         self.start_button.config(state = "disabled")
         #BoxArt(mod_name, self.image_list)
 
@@ -349,6 +379,8 @@ class ui():
 
     def completeFunction(self):
         self.processing = False
+
+        print(logging().success("COMPLETE"))
 
         image = Image.open(relative_to_assets("done.png"))
         image = image.resize((55, 55))
@@ -441,12 +473,58 @@ class ui():
         )
         self.entry_canvas.place(x = 0, y = 0)
         
+        def is_valid_folder_name(folder_name):
+            # Define invalid characters for Windows
+            invalid_chars_windows = r'<>:"/\|?*'
+            invalid_chars_unix = r'/'
+            
+            # Define reserved names for Windows
+            reserved_names = {
+                'CON', 'PRN', 'AUX', 'NUL',
+                'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9',
+                'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9'
+            }
+
+            # Check for invalid characters
+            if re.search(f"[{re.escape(invalid_chars_windows)}]", folder_name) or re.search(f"[{re.escape(invalid_chars_unix)}]", folder_name):
+                return False
+
+            # Check for reserved names (case-insensitive)
+            if folder_name.upper() in reserved_names:
+                return False
+
+            # Check for leading/trailing spaces or periods (Windows specific)
+            if folder_name.startswith(' ') or folder_name.endswith(' ') or folder_name.endswith('.'):
+                return False
+
+            # Check for null characters
+            if '\0' in folder_name:
+                return False
+
+            # Check length (though practically, this is not often a limiting factor)
+            max_length = 50  # Typical maximum filename length
+            if len(folder_name) > max_length:
+                return False
+
+            return True
+        
+        name_validate = (self.entry_root.register(is_valid_folder_name), "%P")
+
         Label(self.entry_canvas, text = "Mod Name:", font = ("Roboto", 18 * -1), anchor = "center", foreground = self.text_colour, background = self.background_colour).place(relx = 0.5, x = -45, y = 40, anchor = "center")
-        self.mod_name_entry = Entry(self.entry_canvas, width = 30)
+        self.mod_name_entry = Entry(
+            self.entry_canvas,
+            width = 30,
+            validate = "key",
+            validatecommand = name_validate
+        )
         self.mod_name_entry.place(relx = 0.5, y = 60, anchor = "center")
 
         Label(self.entry_canvas, text = "Export Directory:", font = ("Roboto", 18 * -1), anchor = "center", foreground = self.text_colour, background = self.background_colour).place(relx = 0.5, x = -25, y = 102, anchor = "center")
-        self.exp_dir_entry = Entry(self.entry_canvas, width = 30)
+        self.exp_dir_entry = Entry(
+            self.entry_canvas, 
+            width = 30
+        )
+        
         self.exp_dir_entry.place(relx = 0.5, y = 127, anchor = "center")
         self.exp_dir_entry.insert(0, f"{getcwd()}/mods")
 

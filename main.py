@@ -1,4 +1,3 @@
-from startup import checks
 from log import logging
 from config import config
 from generate import generate
@@ -8,8 +7,6 @@ from wand import image
 import os
 from collections import Counter
 import threading
-import argparse
-from tkinter.ttk import Progressbar
 
 import subprocess
 
@@ -43,8 +40,8 @@ def place_covers(cover_data, canvas: Image.Image, file_name: str, cover_image: s
 
 def BoxArt(mod_name: str, images: list, export_directory: str):
     #print(mod_name)
-    mod_name = "".join(c for c in mod_name if c.isalpha() or c.isdigit() or c==' ').rstrip()
-    #mod_name = mod_name.replace(" ", "_").lower()
+    #mod_name = "".join(c for c in mod_name if c.isalpha() or c.isdigit() or c==' ').rstrip()
+    mod_name = mod_name.replace(" ", "_").lower()
     #print(mod_name)
     mod_path = f"{export_directory}/{mod_name}"
 
@@ -100,16 +97,3 @@ def BoxArt(mod_name: str, images: list, export_directory: str):
     generate.ini(mod_path, mod_name)
     mod_path = mod_path.replace("/", "\\")
     subprocess.call(fr'explorer /select, "{mod_path}\{mod_name}.ini"')
-
-#if __name__ == "__main__":
-#    parser = argparse.ArgumentParser(description="Process the --name argument.")
-#    parser.add_argument("--name", type=str, required=True, help="Name of the mod")
-
-#    args = parser.parse_args()
-    
-#    check = checks()
-
-#    if check is False:
-#        os.abort()
-#    else:
-#        BoxArt(argCheck(args.name), check)
