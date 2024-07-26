@@ -18,7 +18,7 @@ import webbrowser
 import re
 
 import ctypes
-myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+myappid = 'vamptek.modtools.boxartgenerator.1_5' # arbitrary string
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 ASSETS_PATH = Path(fr"{getcwd()}\\assets")
