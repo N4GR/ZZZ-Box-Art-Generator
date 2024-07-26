@@ -17,6 +17,10 @@ import webbrowser
 
 import re
 
+import ctypes
+myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 ASSETS_PATH = Path(fr"{getcwd()}\\assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
@@ -83,6 +87,8 @@ class ui():
 
         self.window = Tk()
         self.window.title("N4GR - ZZZ Box Art Generator")
+        icon_image = PhotoImage(file = "assets/logo.png")
+        self.window.wm_iconphoto(False, icon_image)
 
         self.button_background_colour = "#FFFFFF"
         self.background_colour = "#FEF7FF"

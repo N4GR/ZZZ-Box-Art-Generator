@@ -50,7 +50,6 @@ def version_check():
     if current_version != newest_version:
         print(logging().error(f"Tool out of date... Your version: {current_version}, latest version: {newest_version}"))
         print(logging().note("Continuing..."))
-        time.sleep(2)
         return False
 
     return True
